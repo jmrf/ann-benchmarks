@@ -1,19 +1,28 @@
 from __future__ import absolute_import
-from os import sep as pathsep
+
 import collections
 import importlib
 import os
 import sys
 import traceback
-import yaml
 from enum import Enum
 from itertools import product
+from os import sep as pathsep
 
+import yaml
 
 Definition = collections.namedtuple(
-    'Definition',
-    ['algorithm', 'constructor', 'module', 'docker_tag',
-     'arguments', 'query_argument_groups', 'disabled'])
+    "Definition",
+    [
+        "algorithm",
+        "constructor",
+        "module",
+        "docker_tag",
+        "arguments",
+        "query_argument_groups",
+        "disabled",
+    ],
+)
 
 
 def get_algorithm_name(name, batch):
@@ -23,8 +32,10 @@ def get_algorithm_name(name, batch):
 
 
 def instantiate_algorithm(definition):
-    print('Trying to instantiate %s.%s(%s)' %
-          (definition.module, definition.constructor, definition.arguments))
+    print(
+        "Trying to instantiate %s.%s(%s)"
+        % (definition.module, definition.constructor, definition.arguments)
+    )
     module = importlib.import_module(definition.module)
     constructor = getattr(module, definition.constructor)
     return constructor(*definition.arguments)
@@ -65,8 +76,7 @@ def _generate_combinations(args):
 
 def _substitute_variables(arg, vs):
     if isinstance(arg, dict):
-        return dict([(k, _substitute_variables(v, vs))
-                     for k, v in arg.items()])
+        return {k: _substitute_variables(v, vs) for k, v in arg.items()}
     elif isinstance(arg, list):
         return [_substitute_variables(a, vs) for a in arg]
     elif isinstance(arg, str) and arg in vs:
@@ -83,13 +93,13 @@ def _get_definitions(definition_file):
 def list_algorithms(definition_file):
     definitions = _get_definitions(definition_file)
 
-    print('The following algorithms are supported...')
+    print("The following algorithms are supported...")
     for point in definitions:
         print('\t... for the point type "%s"...' % point)
         for metric in definitions[point]:
             print('\t\t... and the distance metric "%s":' % metric)
             for algorithm in definitions[point][metric]:
-                print('\t\t\t%s' % algorithm)
+                print("\t\t\t%s" % algorithm)
 
 
 def get_unique_algorithms(definition_file):
@@ -102,8 +112,13 @@ def get_unique_algorithms(definition_file):
     return list(sorted(algos))
 
 
-def get_definitions(definition_file, dimension, point_type="float",
-                    distance_metric="euclidean", count=10):
+def get_definitions(
+    definition_file,
+    dimension,
+    point_type="float",
+    distance_metric="euclidean",
+    count=10,
+):
     definitions = _get_definitions(definition_file)
 
     algorithm_definitions = {}
@@ -113,10 +128,11 @@ def get_definitions(definition_file, dimension, point_type="float",
 
     definitions = []
     for (name, algo) in algorithm_definitions.items():
-        for k in ['docker-tag', 'module', 'constructor']:
+        for k in ["docker-tag", "module", "constructor"]:
             if k not in algo:
                 raise Exception(
-                    'algorithm %s does not define a "%s" property' % (name, k))
+                    'algorithm {} does not define a "{}" property'.format(name, k)
+                )
 
         base_args = []
         if "base-args" in algo:
@@ -163,17 +179,19 @@ def get_definitions(definition_file, dimension, point_type="float",
                 vs = {
                     "@count": count,
                     "@metric": distance_metric,
-                    "@dimension": dimension
+                    "@dimension": dimension,
                 }
                 aargs = [_substitute_variables(arg, vs) for arg in aargs]
-                definitions.append(Definition(
-                    algorithm=name,
-                    docker_tag=algo['docker-tag'],
-                    module=algo['module'],
-                    constructor=algo['constructor'],
-                    arguments=aargs,
-                    query_argument_groups=query_args,
-                    disabled=algo.get('disabled', False)
-                ))
+                definitions.append(
+                    Definition(
+                        algorithm=name,
+                        docker_tag=algo["docker-tag"],
+                        module=algo["module"],
+                        constructor=algo["constructor"],
+                        arguments=aargs,
+                        query_argument_groups=query_args,
+                        disabled=algo.get("disabled", False),
+                    )
+                )
 
     return definitions

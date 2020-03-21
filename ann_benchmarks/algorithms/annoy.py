@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 import annoy
 from ann_benchmarks.algorithms.base import BaseANN
 
@@ -22,5 +23,4 @@ class Annoy(BaseANN):
         return self._annoy.get_nns_by_vector(v.tolist(), n, self._search_k)
 
     def __str__(self):
-        return 'Annoy(n_trees=%d, search_k=%d)' % (self._n_trees,
-                                                   self._search_k)
+        return "Annoy(n_trees=%d, search_k=%d)" % (self._n_trees, self._search_k)

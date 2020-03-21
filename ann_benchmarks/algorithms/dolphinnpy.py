@@ -1,16 +1,20 @@
 from __future__ import absolute_import
-import sys
-sys.path.append("install/lib-dolphinnpy")  # noqa
-import numpy
+
 import ctypes
-from dolphinn import Dolphinn
-from utils import findmean, isotropize
+import sys
+
+import numpy
 from ann_benchmarks.algorithms.base import BaseANN
+from dolphinn import Dolphinn
+from utils import findmean
+from utils import isotropize
+
+sys.path.append("install/lib-dolphinnpy")  # noqa
 
 
 class DolphinnPy(BaseANN):
     def __init__(self, num_probes):
-        self.name = 'Dolphinn(num_probes={} )'.format(num_probes)
+        self.name = "Dolphinn(num_probes={} )".format(num_probes)
         self.num_probes = num_probes
         self.m = 1
         self._index = None
