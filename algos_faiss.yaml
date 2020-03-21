@@ -1,0 +1,129 @@
+# configuration file structure:
+# data-type (float, bit, int, ...):
+#     distance (jaccard, euclidean, hamming, ...):
+#         lib:
+
+float:
+  any:
+    faiss-lsh:
+      disabled: true
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss
+      constructor: FaissLSH
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          # When @args is a list, the result is the Cartesian product of all of
+          # the things it contains; entries that aren't a list will be treated
+          # as lists of length one.
+          args: [[32, 64, 128, 256, 512, 1024, 2048, 4096]]
+          # This run group will produce eight algorithm instances:
+          # FaissLSH(32), FaissLSH(64), and so on up to FaissLSH(4096).
+    faiss-ivf:
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss
+      constructor: FaissIVF
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [[32,64,128,256,512,1024,2048,4096,8192]]
+          query-args: [[1, 5, 10, 50, 100, 200]]
+    faiss-gpu:
+      disabled: true
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss_gpu
+      constructor: FaissGPU
+      run-groups:
+        base:
+          args: [[400, 1024, 4096, 8192, 16384],
+                 [1, 10, 40, 100, 200]]
+
+    hnsw(faiss):
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss_hnsw
+      constructor: FaissHNSW
+      base-args: ["@metric"]
+      run-groups:
+        M-4:
+          arg-groups:
+          - {"M": 4,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-8:
+          arg-groups:
+          - {"M": 8,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-12:
+          arg-groups:
+          - {"M": 12,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-16:
+          arg-groups:
+          - {"M": 16,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-24:
+          arg-groups:
+          - {"M": 24,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-36:
+          arg-groups:
+          - {"M": 36,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-48:
+          arg-groups:
+          - {"M": 48,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-64:
+          arg-groups:
+          - {"M": 64,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+        M-96:
+          arg-groups:
+          - {"M": 96,  "efConstruction": 500}
+          query-args: [[10, 20, 40, 80, 120, 200, 400, 600, 800]]
+
+    bruteforce:
+      disabled: true
+      docker-tag: ann-benchmarks-sklearn
+      module: ann_benchmarks.algorithms.bruteforce
+      constructor: BruteForce
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+    bruteforce-blas:
+      docker-tag: ann-benchmarks-sklearn
+      module: ann_benchmarks.algorithms.bruteforce
+      constructor: BruteForceBLAS
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+    dummy-algo-st:
+      disabled: true
+      docker-tag: ann-benchmarks-sklearn
+      module: ann_benchmarks.algorithms.dummy_algo
+      constructor: DummyAlgoSt
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+    dummy-algo-mt:
+      disabled: true
+      docker-tag: ann-benchmarks-sklearn
+      module: ann_benchmarks.algorithms.dummy_algo
+      constructor: DummyAlgoMt
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+
+  angular:
+    faiss-ivf:
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss
+      constructor: FaissIVF
+      base-args: ["euclidean"]
+      run-groups:
+        base:
+          args: [[32,64,128,256,512,1024,2048,4096,8192]]
+          query-args: [[1, 5, 10, 50, 100, 200]]

@@ -33,6 +33,43 @@ class Faiss(BaseANN):
         return res
 
 
+class FaissFlat(Faiss):
+    """Flat Index:
+
+    Flat indexes just encode the vectors into codes of a fixed size and
+    store them in an array of ntotal * code_size bytes.
+
+    At search time, all the indexed vectors are decoded sequentially and
+    compared to the query vectors.
+    For the IndexPQ the comparison is done in the compressed domain, which is faster.
+
+    The available encodings are (from least to strongest compression):
+
+        * IndexFlat: No encoding at all.
+            The vectors are stored without compression;
+        * 16-bit float encoding (IndexScalarQuantizer with QT_fp16):
+            the vectors are compressed to 16-bit floats, which may cause some loss of precision;
+        * IndexScalarQuantizer with QT_8bit/QT_6bit/QT_4bit: 8/6/4-bit integer encoding
+            (vectors quantized to 256/64/16 levels)
+        * IndexPQ: PQ encoding.
+            Vectors are split into sub-vectors that are each quantized to a few bits (usually 8).
+
+
+    """
+    def __init__(self, n_dims, encoding=None):
+        self.n_dims = n_dims
+        self.index = None
+        self.name = f'FaissFlatL2(n_dims={self.n_dims})'
+
+    def fit(self, X):
+        if X.dtype != numpy.float32:
+            X = X.astype(numpy.float32)
+        f = X.shape[1]
+        self.index = faiss.IndexFlatL2(f)
+        self.index.train(X)
+        self.index.add(X)
+
+
 class FaissLSH(Faiss):
     def __init__(self, metric, n_bits):
         self._n_bits = n_bits
@@ -50,6 +87,27 @@ class FaissLSH(Faiss):
 
 
 class FaissIVF(Faiss):
+
+    """Inverse File Index: Non-exhaustive searches.
+
+    The IndexIVF class (and its children) is used for large-scale indices.
+    It clusters all input vectors into nlist groups (nlist is a field of IndexIVF).
+    At add time, a vector is assigned to a groups. At search time, the most similar
+    groups to the query vector are identified and scanned exhaustively.
+
+    Thus, the IndexIVF has two components:
+
+        * Quantizer (aka coarse quantizer) index:
+        Given a vector, the search function of the quantizer index
+        returns the group the vector belongs to.
+        When searched with nprobe>1 results, it returns the nprobe
+        nearest groups to the query vector (nprobe is a field of IndexIVF).
+
+        * InvertedLists object:
+        This object maps a group id (in 0..nlist-1), to a sequence of (code, id) pairs.
+
+    """
+
     def __init__(self, metric, n_list):
         self._n_list = n_list
         self._metric = metric
