@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 import psutil
 
 
-class BaseANN(object):
+class BaseANN:
     def done(self):
         pass
 

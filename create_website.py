@@ -6,8 +6,11 @@ import pickle
 
 import matplotlib as mpl
 import numpy
-import plot
 import yaml
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
+import plot
 from ann_benchmarks import results
 from ann_benchmarks.algorithms.definitions import get_algorithm_name
 from ann_benchmarks.datasets import get_dataset
@@ -18,8 +21,6 @@ from ann_benchmarks.plotting.utils import compute_metrics
 from ann_benchmarks.plotting.utils import create_linestyles
 from ann_benchmarks.plotting.utils import create_pointset
 from ann_benchmarks.plotting.utils import get_plot_label
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
 
 mpl.use("Agg")  # noqa
 

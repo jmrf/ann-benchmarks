@@ -1,8 +1,7 @@
-from __future__ import absolute_import
-
 import os
 
 import numpy
+
 import pykgraph
 from ann_benchmarks.algorithms.base import BaseANN
 from ann_benchmarks.constants import INDEX_DIR

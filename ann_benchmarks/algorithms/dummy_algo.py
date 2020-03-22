@@ -1,6 +1,5 @@
-from __future__ import absolute_import
-
 import numpy as np
+
 from ann_benchmarks.algorithms.base import BaseANN
 
 

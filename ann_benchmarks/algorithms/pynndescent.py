@@ -1,8 +1,7 @@
-from __future__ import absolute_import
-
 import numpy as np
-import pynndescent
 import scipy.sparse
+
+import pynndescent
 from ann_benchmarks.algorithms.base import BaseANN
 
 

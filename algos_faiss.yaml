@@ -5,6 +5,24 @@
 
 float:
   any:
+    flat-l2:
+      disabled: true
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss
+      constructor: FaissIVF
+      base-args: ["@metric"]
+      run-groups:
+        empty:
+          args: []
+    faiss-ivf:
+      docker-tag: ann-benchmarks-faiss
+      module: ann_benchmarks.algorithms.faiss
+      constructor: FaissIVF
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [[32,64,128,256,512,1024,2048,4096,8192]]
+          query-args: [[1, 5, 10, 50, 100, 200]]
     faiss-lsh:
       disabled: true
       docker-tag: ann-benchmarks-faiss
@@ -19,15 +37,6 @@ float:
           args: [[32, 64, 128, 256, 512, 1024, 2048, 4096]]
           # This run group will produce eight algorithm instances:
           # FaissLSH(32), FaissLSH(64), and so on up to FaissLSH(4096).
-    faiss-ivf:
-      docker-tag: ann-benchmarks-faiss
-      module: ann_benchmarks.algorithms.faiss
-      constructor: FaissIVF
-      base-args: ["@metric"]
-      run-groups:
-        base:
-          args: [[32,64,128,256,512,1024,2048,4096,8192]]
-          query-args: [[1, 5, 10, 50, 100, 200]]
     faiss-gpu:
       disabled: true
       docker-tag: ann-benchmarks-faiss
@@ -90,32 +99,6 @@ float:
       run-groups:
         empty:
           args: []
-    bruteforce-blas:
-      docker-tag: ann-benchmarks-sklearn
-      module: ann_benchmarks.algorithms.bruteforce
-      constructor: BruteForceBLAS
-      base-args: ["@metric"]
-      run-groups:
-        empty:
-          args: []
-    dummy-algo-st:
-      disabled: true
-      docker-tag: ann-benchmarks-sklearn
-      module: ann_benchmarks.algorithms.dummy_algo
-      constructor: DummyAlgoSt
-      base-args: ["@metric"]
-      run-groups:
-        empty:
-          args: []
-    dummy-algo-mt:
-      disabled: true
-      docker-tag: ann-benchmarks-sklearn
-      module: ann_benchmarks.algorithms.dummy_algo
-      constructor: DummyAlgoMt
-      base-args: ["@metric"]
-      run-groups:
-        empty:
-          args: []
 
   angular:
     faiss-ivf:
@@ -127,3 +110,12 @@ float:
         base:
           args: [[32,64,128,256,512,1024,2048,4096,8192]]
           query-args: [[1, 5, 10, 50, 100, 200]]
+
+binary:
+  any:
+    IndexFlatIP:
+      disabled: true
+      docker-tag: ann-benchmarks-sklearn
+      module: ann_benchmarks.algorithms.dummy_algo
+      constructor: DummyAlgoMt
+      base-args: ["@metric"]

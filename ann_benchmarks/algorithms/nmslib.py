@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 
 import nmslib
@@ -10,7 +8,7 @@ from ann_benchmarks.constants import INDEX_DIR
 class NmslibReuseIndex(BaseANN):
     @staticmethod
     def encode(d):
-        return ["{}={}".format(a, b) for (a, b) in d.items()]
+        return [f"{a}={b}" for (a, b) in d.items()]
 
     def __init__(self, metric, method_name, index_param, query_param):
         self._nmslib_metric = {"angular": "cosinesimil", "euclidean": "l2"}[metric]

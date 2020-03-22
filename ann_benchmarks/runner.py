@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import json
+import logging
 import multiprocessing
 import os
 import sys
@@ -12,6 +13,7 @@ import docker
 import numpy
 import psutil
 import requests
+
 from ann_benchmarks.algorithms.definitions import Definition
 from ann_benchmarks.algorithms.definitions import get_algorithm_name
 from ann_benchmarks.algorithms.definitions import instantiate_algorithm
@@ -21,6 +23,8 @@ from ann_benchmarks.distance import dataset_transform
 from ann_benchmarks.distance import metrics
 from ann_benchmarks.results import store_results
 
+logger = logging.getLogger(__name__)
+
 
 def run_individual_query(algo, X_train, X_test, distance, count, run_count, batch):
     prepared_queries = (batch and hasattr(algo, "prepare_batch_query")) or (
@@ -29,7 +33,7 @@ def run_individual_query(algo, X_train, X_test, distance, count, run_count, batc
 
     best_search_time = float("inf")
     for i in range(run_count):
-        print("Run %d/%d..." % (i + 1, run_count))
+        logger.notice(f"Run {i + 1}/{run_count}...")
         # a bit dumb but can't be a scalar since of Python's scoping rules
         n_items_processed = [0]
 
@@ -53,12 +57,12 @@ def run_individual_query(algo, X_train, X_test, distance, count, run_count, batc
             ]
             n_items_processed[0] += 1
             if n_items_processed[0] % 1000 == 0:
-                print(
+                logger.info(
                     "Processed %d/%d queries..." % (n_items_processed[0], len(X_test))
                 )
             if len(candidates) > count:
-                print(
-                    "warning: algorithm %s returned %d results, but count"
+                logger.warning(
+                    "Algorithm %s returned %d results, but count"
                     " is only %d)" % (algo, len(candidates), count)
                 )
             return (total, candidates)
@@ -118,21 +122,19 @@ def run(definition, dataset, count, run_count, batch):
     algo = instantiate_algorithm(definition)
     assert not definition.query_argument_groups or hasattr(
         algo, "set_query_arguments"
-    ), """\
-error: query argument groups have been specified for %s.%s(%s), but the \
-algorithm instantiated from it does not implement the set_query_arguments \
-function""" % (
-        definition.module,
-        definition.constructor,
-        definition.arguments,
+    ), (
+        "error: query argument groups have been specified "
+        f"for {definition.module}.{definition.constructor}({definition.arguments}), "
+        "but the algorithm instantiated from it does not implement "
+        "the set_query_arguments function"
     )
 
     D = get_dataset(dataset)
     X_train = numpy.array(D["train"])
     X_test = numpy.array(D["test"])
     distance = D.attrs["distance"]
-    print("got a train set of size (%d * %d)" % X_train.shape)
-    print("got %d queries" % len(X_test))
+    logger.notice("Got a train set of size (%d * %d)" % X_train.shape)
+    logger.notice("Got %d queries" % len(X_test))
 
     X_train = dataset_transform[distance](X_train)
     X_test = dataset_transform[distance](X_test)
@@ -147,8 +149,9 @@ function""" % (
         algo.fit(X_train)
         build_time = time.time() - t0
         index_size = algo.get_memory_usage() - memory_usage_before
-        print("Built index in", build_time)
-        print("Index size: ", index_size)
+
+        logger.info(f"Built index in: {build_time} seconds")
+        logger.info(f"Index size: {index_size} KiB")
 
         query_argument_groups = definition.query_argument_groups
         # Make sure that algorithms with no query argument groups still get run
@@ -157,7 +160,7 @@ function""" % (
             query_argument_groups = [[]]
 
         for pos, query_arguments in enumerate(query_argument_groups, 1):
-            print(
+            logger.info(
                 "Running query argument group %d of %d..."
                 % (pos, len(query_argument_groups))
             )
@@ -254,11 +257,7 @@ def run_docker(
         for line in container.logs(stream=True):
             print(colors.color(line.decode().rstrip(), fg="blue"))
 
-    if sys.version_info >= (3, 0):
-        t = threading.Thread(target=stream_logs, daemon=True)
-    else:
-        t = threading.Thread(target=stream_logs)
-        t.daemon = True
+    t = threading.Thread(target=stream_logs, daemon=True)
     t.start()
     try:
         exit_code = container.wait(timeout=timeout)

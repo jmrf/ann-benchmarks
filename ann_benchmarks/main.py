@@ -1,13 +1,15 @@
-from __future__ import absolute_import
-
 import argparse
+import logging
 import os
 import random
 import shutil
 import sys
 import traceback
+from pprint import pformat
 
 import docker
+
+from ann_benchmarks import set_logger
 from ann_benchmarks.algorithms.definitions import InstantiationStatus
 from ann_benchmarks.algorithms.definitions import algorithm_status
 from ann_benchmarks.algorithms.definitions import get_definitions
@@ -18,6 +20,8 @@ from ann_benchmarks.datasets import get_dataset
 from ann_benchmarks.results import get_result_filename
 from ann_benchmarks.runner import run
 from ann_benchmarks.runner import run_docker
+
+logger = set_logger(__name__, logging.DEBUG)
 
 
 def positive_int(s):
@@ -116,6 +120,7 @@ def main():
     )
 
     args = parser.parse_args()
+
     if args.timeout == -1:
         args.timeout = None
 
@@ -192,19 +197,19 @@ def main():
             # of the right name, then the definition is broken
             if status == InstantiationStatus.NO_CONSTRUCTOR:
                 raise Exception(
-                    "%s.%s(%s): error: the module '%s' does not"
+                    "{df.module}.{df.constructor}({df.arguments}): "
+                    "error: the module '{df.module}' does not"
                     " expose the named constructor"
-                    % (df.module, df.constructor, df.arguments, df.module)
                 )
 
             if status == InstantiationStatus.NO_MODULE:
                 # If the module couldn't be loaded (presumably because
                 # of a missing dependency), print a warning and remove
                 # this definition from the list of things to be run
-                print(
-                    "%s.%s(%s): warning: the module '%s' could not be "
+                logger.warning(
+                    f"{df.module}.{df.constructor}({df.arguments}): "
+                    f"warning: the module '{df.module}' could not be "
                     "loaded; skipping"
-                    % (df.module, df.constructor, df.arguments, df.module)
                 )
                 return False
             else:
@@ -213,11 +218,9 @@ def main():
         definitions = [d for d in definitions if _test(d)]
 
     if not args.run_disabled:
-        if len([d for d in definitions if d.disabled]):
-            print(
-                "Not running disabled algorithms:",
-                [d for d in definitions if d.disabled],
-            )
+        dis = [d for d in definitions if d.disabled]
+        if len(dis):
+            logger.warning(f"Not running disabled algorithms: {pformat(dis)}",)
         definitions = [d for d in definitions if not d.disabled]
 
     if args.max_n_algorithms >= 0:
@@ -233,8 +236,10 @@ def main():
 
         try:
             if args.local:
+                logger.info(f"Running localy")
                 run(definition, args.dataset, args.count, args.runs, args.batch)
             else:
+                logger.info(f"Running dockerized")
                 run_docker(
                     definition,
                     args.dataset,

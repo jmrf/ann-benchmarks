@@ -1,8 +1,7 @@
-from __future__ import absolute_import
-
-import mrpt
 import numpy
 import sklearn.preprocessing
+
+import mrpt
 from ann_benchmarks.algorithms.base import BaseANN
 
 

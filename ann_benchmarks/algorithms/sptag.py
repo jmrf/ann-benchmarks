@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import SPTAG
 from ann_benchmarks.algorithms.base import BaseANN
 

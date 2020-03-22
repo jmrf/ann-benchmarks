@@ -6,13 +6,14 @@ from urllib.request import urlretrieve
 
 import h5py
 import numpy
+
 from ann_benchmarks.distance import dataset_transform
 
 
 def download(src, dst):
     if not os.path.exists(dst):
         # TODO: should be atomic
-        print("downloading {} -> {}...".format(src, dst))
+        print(f"downloading {src} -> {dst}...")
         urlretrieve(src, dst)
 
 

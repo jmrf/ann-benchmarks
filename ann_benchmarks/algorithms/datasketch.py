@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from ann_benchmarks.algorithms.base import BaseANN
 from datasketch import MinHash
 from datasketch import MinHashLSHForest

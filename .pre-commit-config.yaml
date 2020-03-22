@@ -7,9 +7,9 @@ repos:
     # - id: name-tests-test
     #   args: ['--django']
     - id: detect-private-key
-    # - id: requirements-txt-fixer
-    # - id: check-yaml
-    # - id: check-json
+    - id: requirements-txt-fixer
+    - id: check-yaml
+    - id: check-json
 
 -   repo: https://github.com/ambv/black
     rev: stable
@@ -21,13 +21,13 @@ repos:
     rev: 3.7.1
     hooks:
     - id: flake8
-      exclude: ^docs/|^rasa/nlu/external/
+      exclude: ^docs/|^install/
 
 -   repo: https://github.com/pre-commit/mirrors-isort
     rev: v4.3.21  # Use the revision sha / tag you want to point at
     hooks:
     -   id: isort
-        exclude: ^rasa/__init__.py|^rasa/core/channels/__init__.py|^rasa/core/restore.py
+        exclude: ^rasa/__init__.py|^install/
 
 -   repo: https://github.com/asottile/pyupgrade
     rev: v1.11.1

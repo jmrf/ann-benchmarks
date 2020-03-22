@@ -1,7 +1,6 @@
-from __future__ import absolute_import
-
 import numpy
 import sklearn.neighbors
+
 from ann_benchmarks.algorithms.base import BaseANN
 from ann_benchmarks.distance import metrics as pd
 

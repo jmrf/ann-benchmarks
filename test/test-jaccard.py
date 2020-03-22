@@ -1,6 +1,7 @@
 import unittest
 
 import numpy
+
 from ann_benchmarks.distance import jaccard
 from ann_benchmarks.distance import transform_dense_to_sparse
 

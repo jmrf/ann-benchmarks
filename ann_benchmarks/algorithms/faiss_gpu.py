@@ -1,10 +1,9 @@
-from __future__ import absolute_import
-
 import ctypes
 import sys
 
 import faiss
 import numpy
+
 from ann_benchmarks.algorithms.base import BaseANN
 
 # Assumes local installation of FAISS
@@ -16,7 +15,7 @@ sys.path.append("faiss")  # noqa
 
 class FaissGPU(BaseANN):
     def __init__(self, n_bits, n_probes):
-        self.name = "FaissGPU(n_bits={}, n_probes={})".format(n_bits, n_probes)
+        self.name = f"FaissGPU(n_bits={n_bits}, n_probes={n_probes})"
         self._n_bits = n_bits
         self._n_probes = n_probes
         self._res = faiss.StandardGpuResources()

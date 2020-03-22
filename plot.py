@@ -1,9 +1,12 @@
 import argparse
+import logging
 import os
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+
+from ann_benchmarks import set_logger
 from ann_benchmarks.algorithms.definitions import get_definitions
 from ann_benchmarks.datasets import get_dataset
 from ann_benchmarks.plotting.metrics import all_metrics as metrics
@@ -19,12 +22,16 @@ from ann_benchmarks.results import store_results
 mpl.use("Agg")  # noqa
 
 
+logger = set_logger(__name__, logging.DEBUG)
+
+
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles, batch):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
     labels = []
     plt.figure(figsize=(12, 9))
+
     for algo in sorted(all_data.keys(), key=lambda x: x.lower()):
         xs, ys, ls, axs, ays, als = create_pointset(all_data[algo], xn, yn)
         color, faded, linestyle, marker = linestyles[algo]

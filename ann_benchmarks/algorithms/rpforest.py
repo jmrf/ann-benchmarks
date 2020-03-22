@@ -1,6 +1,5 @@
-from __future__ import absolute_import
-
 import numpy
+
 import rpforest
 from ann_benchmarks.algorithms.base import BaseANN
 

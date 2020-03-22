@@ -1,11 +1,10 @@
-from __future__ import absolute_import
-
 import shlex
 import subprocess
 from os.path import basename
 from types import MethodType
 
 import psutil
+
 from ann_benchmarks.algorithms.base import BaseANN
 from ann_benchmarks.data import bit_unparse_entry
 from ann_benchmarks.data import float_unparse_entry
@@ -139,7 +138,7 @@ query neither succeeded nor failed"""
 
 class PreparedSubprocess(Subprocess):
     def __init__(self, args, encoder, params):
-        super(PreparedSubprocess, self).__init__(args, encoder, params)
+        super().__init__(args, encoder, params)
         self._result_count = None
 
     def _configuration_hook(self):
@@ -187,7 +186,7 @@ query neither succeeded nor failed"""
 
 class BatchSubprocess(Subprocess):
     def __init__(self, args, encoder, params):
-        super(BatchSubprocess, self).__init__(args, encoder, params)
+        super().__init__(args, encoder, params)
         self._qp_count = None
 
     def _configuration_hook(self):

@@ -1,8 +1,7 @@
-from __future__ import absolute_import
-
 import itertools
 
 import numpy
+
 from ann_benchmarks.plotting.metrics import all_metrics as metrics
 
 
@@ -84,7 +83,7 @@ def compute_all_metrics(true_nn_distances, run, properties, recompute=False):
         )
         results[name] = v
         if v:
-            print("{}: {:g}".format(name, v))
+            print(f"{name}: {v:g}")
     return (algo, algo_name, results)
 
 

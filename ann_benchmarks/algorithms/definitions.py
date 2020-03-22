@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import collections
 import importlib
 import os
@@ -86,7 +84,7 @@ def _substitute_variables(arg, vs):
 
 
 def _get_definitions(definition_file):
-    with open(definition_file, "r") as f:
+    with open(definition_file) as f:
         return yaml.load(f, yaml.SafeLoader)
 
 
@@ -124,15 +122,15 @@ def get_definitions(
     algorithm_definitions = {}
     if "any" in definitions[point_type]:
         algorithm_definitions.update(definitions[point_type]["any"])
-    algorithm_definitions.update(definitions[point_type][distance_metric])
+
+    if distance_metric in definitions[point_type]:
+        algorithm_definitions.update(definitions[point_type][distance_metric])
 
     definitions = []
     for (name, algo) in algorithm_definitions.items():
         for k in ["docker-tag", "module", "constructor"]:
             if k not in algo:
-                raise Exception(
-                    'algorithm {} does not define a "{}" property'.format(name, k)
-                )
+                raise Exception(f'algorithm {name} does not define a "{k}" property')
 
         base_args = []
         if "base-args" in algo:

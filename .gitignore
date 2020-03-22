@@ -1,10 +1,20 @@
+.vscode/
+
 .DS_Store
+
 *.pyc
 *.o
+
 protocol/c/fr-*
 
 install/*.txt
 install/*.yaml
 install/lib-*/
+
+lib-faiss/
+
 data/*
 *.class
+
+website/
+results/*/

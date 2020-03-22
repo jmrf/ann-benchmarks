@@ -1,7 +1,6 @@
-from __future__ import absolute_import
+import sklearn.preprocessing
 
 import nearpy
-import sklearn.preprocessing
 from ann_benchmarks.algorithms.base import BaseANN
 from nearpy.filters import NearestFilter
 

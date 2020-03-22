@@ -1,12 +1,11 @@
-from __future__ import absolute_import
-
 import os
 import subprocess
 import sys
 import time
 
-import ngtpy
 import numpy as np
+
+import ngtpy
 from ann_benchmarks.algorithms.base import BaseANN
 from ann_benchmarks.constants import INDEX_DIR
 
@@ -39,8 +38,7 @@ class ONNG(BaseANN):
         if not os.path.exists(index_dir):
             os.makedirs(index_dir)
         index = os.path.join(
-            index_dir,
-            "ONNG-{}-{}-{}".format(self._edge_size, self._outdegree, self._indegree),
+            index_dir, f"ONNG-{self._edge_size}-{self._outdegree}-{self._indegree}",
         )
         anngIndex = os.path.join(index_dir, "ANNG-" + str(self._edge_size))
         print("ONNG: index=" + index)

@@ -1,14 +1,17 @@
-from __future__ import absolute_import
-
 import ctypes
+import logging
 import sys
 
 import faiss
 import numpy
 import sklearn.preprocessing
+
 from ann_benchmarks.algorithms.base import BaseANN
 
 sys.path.append("install/lib-faiss")  # noqa
+
+
+logger = logging.getLogger(__name__)
 
 
 class Faiss(BaseANN):
@@ -47,15 +50,14 @@ class FaissFlat(Faiss):
 
     The available encodings are (from least to strongest compression):
 
-        * IndexFlat: No encoding at all.
-            The vectors are stored without compression;
-        * 16-bit float encoding (IndexScalarQuantizer with QT_fp16):
-            the vectors are compressed to 16-bit floats, which may cause some loss of precision;
-        * IndexScalarQuantizer with QT_8bit/QT_6bit/QT_4bit: 8/6/4-bit integer encoding
-            (vectors quantized to 256/64/16 levels)
-        * IndexPQ: PQ encoding.
-            Vectors are split into sub-vectors that are each quantized to a few bits (usually 8).
-
+    * IndexFlat: No encoding at all.
+        The vectors are stored without compression;
+    * 16-bit float encoding (IndexScalarQuantizer with QT_fp16):
+        The vectors are compressed to 16-bit floats, which may cause some loss of precision;
+    * IndexScalarQuantizer with QT_8bit/QT_6bit/QT_4bit: 8/6/4-bit integer encoding
+        (vectors quantized to 256/64/16 levels)
+    * IndexPQ: PQ encoding.
+        Vectors are split into sub-vectors that are each quantized to a few bits (usually 8).
 
     """
 
@@ -78,7 +80,7 @@ class FaissLSH(Faiss):
         self._n_bits = n_bits
         self.index = None
         self._metric = metric
-        self.name = "FaissLSH(n_bits={})".format(self._n_bits)
+        self.name = f"FaissLSH(n_bits={self._n_bits})"
 
     def fit(self, X):
         if X.dtype != numpy.float32:
@@ -100,13 +102,13 @@ class FaissIVF(Faiss):
 
     Thus, the IndexIVF has two components:
 
-        * Quantizer (aka coarse quantizer) index:
+    * Quantizer (aka coarse quantizer) index:
         Given a vector, the search function of the quantizer index
         returns the group the vector belongs to.
         When searched with nprobe>1 results, it returns the nprobe
         nearest groups to the query vector (nprobe is a field of IndexIVF).
 
-        * InvertedLists object:
+    * InvertedLists object:
         This object maps a group id (in 0..nlist-1), to a sequence of (code, id) pairs.
 
     """
@@ -114,6 +116,7 @@ class FaissIVF(Faiss):
     def __init__(self, metric, n_list):
         self._n_list = n_list
         self._metric = metric
+        logger.info(f"Creating: {self.__str__}")
 
     def fit(self, X):
         if self._metric == "angular":
